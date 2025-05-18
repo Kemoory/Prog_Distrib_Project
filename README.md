@@ -20,3 +20,4 @@ Services internes :
 ```
 Le frontend fait des requêtes http au backend qui va ensuite récupérer les données dans la base pour ensuite les envoyer au frontend qui va les afficher.
 
+Pour voir à quoi ressemble le site veuillez télécharger la vidéo : presentation_site.mp4
