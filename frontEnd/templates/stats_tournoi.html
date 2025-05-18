@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Tournoi - {{ date }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../static/css/styles.css">
+    <link rel="stylesheet" href="../../static/css/dark-mode.css">
+    <link rel="stylesheet" href="../../static/css/animations.css">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <section class="hero is-primary is-small animated-gradient">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-2 has-text-centered glow-text">
+                    <i class="fas fa-gamepad"></i> Tournoi du {{ date }}
+                </h1>
+                <h2 class="subtitle has-text-centered">
+                    Résultats détaillés de la compétition
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <!-- Podium -->
+            <div class="columns mb-5">
+                <div class="column is-10 is-offset-1">
+                    <div class="card glass-card fade-in">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-trophy"></i> Podium
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="podium-container">
+                                {% if resultats|length >= 3 %}
+                                <div class="columns is-mobile has-text-centered">
+                                    <!-- 2ème place -->
+                                    <div class="column is-4">
+                                        <div class="podium podium-second">
+                                            <div class="podium-player">
+                                                <i class="fas fa-user-circle fa-3x"></i>
+                                                <div class="podium-name">
+                                                    <a href="/stats/joueur/{{ resultats[1].nom }}" class="has-text-primary">{{ resultats[1].nom }}</a>
+                                                </div>
+                                                <div class="podium-score">{{ resultats[1].score }} pts</div>
+                                                <div class="podium-medal">
+                                                    <i class="fas fa-medal"></i> 2
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 1er place -->
+                                    <div class="column is-4">
+                                        <div class="podium podium-first">
+                                            <div class="podium-player">
+                                                <i class="fas fa-user-circle fa-4x"></i>
+                                                <div class="podium-name">
+                                                    <a href="/stats/joueur/{{ resultats[0].nom }}" class="has-text-primary">{{ resultats[0].nom }}</a>
+                                                </div>
+                                                <div class="podium-score">{{ resultats[0].score }} pts</div>
+                                                <div class="podium-medal">
+                                                    <i class="fas fa-medal"></i> 1
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 3ème place -->
+                                    <div class="column is-4">
+                                        <div class="podium podium-third">
+                                            <div class="podium-player">
+                                                <i class="fas fa-user-circle fa-3x"></i>
+                                                <div class="podium-name">
+                                                    <a href="/stats/joueur/{{ resultats[2].nom }}" class="has-text-primary">{{ resultats[2].nom }}</a>
+                                                </div>
+                                                <div class="podium-score">{{ resultats[2].score }} pts</div>
+                                                <div class="podium-medal">
+                                                    <i class="fas fa-medal"></i> 3
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="has-text-centered">
+                                    <p class="subtitle">
+                                        Pas assez de participants pour afficher le podium.
+                                    </p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/add_tournament" class="card-footer-item">
+                                <i class="fas fa-plus"></i> Ajouter un tournoi
+                            </a>
+                            <a href="/classement" class="card-footer-item">
+                                <i class="fas fa-list-ol"></i> Voir le classement
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Détails du tournoi -->
+            <div class="columns">
+                <div class="column is-10 is-offset-1">
+                    <div class="card glass-card fade-in">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-info-circle"></i> Détails du Tournoi
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <table class="table is-fullwidth is-hoverable">
+                                <thead>
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Joueur</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for joueur in resultats %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>
+                                            <a href="/stats/joueur/{{ joueur.nom }}" class="has-text-primary">{{ joueur.nom }}</a>
+                                        </td>
+                                        <td>{{ joueur.score }} pts</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/stats/tournois" class="card-footer-item">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% include 'footer.html' %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../static/js/script.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Code pour gérer les interactions avec le tableau des résultats
+            $('#tournoisDateSearch').on('change', function() {
+                var selectedDate = $(this).val();
+                $('.tournoi-row').each(function() {
+                    if ($(this).data('date') === selectedDate) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            $('#btnResetSearch').on('click', function() {
+                $('.tournoi-row').show();
+                $('#tournoisDateSearch').val('');
+            });
+        });
+    </script>
+    <script>
+        // Animation pour les éléments au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+                element.classList.add('fade-in');
+            });
+        });
+    </script>
+</body>

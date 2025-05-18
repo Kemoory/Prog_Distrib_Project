@@ -1,0 +1,90 @@
+# Use a PostgreSQL image with Python
+FROM python:3.9-slim-bullseye
+
+# Install PostgreSQL and required dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql \
+    postgresql-contrib \
+    postgresql-client \
+    libpq-dev \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for PostgreSQL
+ENV POSTGRES_USER=username
+ENV POSTGRES_PASSWORD=mypassword
+ENV POSTGRES_DB=tournament_db
+ENV PGDATA=/var/lib/postgresql/data
+
+# Create work directory
+WORKDIR /app
+
+# Copy application files
+COPY requirements.txt .
+COPY backend.py .
+COPY config.py .
+COPY db.sql .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Create a startup script
+RUN echo '#!/bin/bash\n\
+# Initialize PostgreSQL if needed\n\
+if [ ! -d "$PGDATA" ] || [ -z "$(ls -A $PGDATA)" ]; then\n\
+    mkdir -p "$PGDATA"\n\
+    chown -R postgres:postgres "$PGDATA"\n\
+    chmod 700 "$PGDATA"\n\
+    sudo -u postgres /usr/lib/postgresql/13/bin/initdb -D "$PGDATA"\n\
+    \n\
+    # Start PostgreSQL service\n\
+    sudo service postgresql start\n\
+    sleep 3 # Give PostgreSQL time to start\n\
+    \n\
+    # Create database and user\n\
+    sudo -u postgres psql -c "CREATE USER $POSTGRES_USER WITH PASSWORD '\''$POSTGRES_PASSWORD'\'';" || true\n\
+    sudo -u postgres psql -c "CREATE DATABASE $POSTGRES_DB WITH OWNER $POSTGRES_USER;" || true\n\
+    sudo -u postgres psql -c "ALTER USER $POSTGRES_USER WITH SUPERUSER;" || true\n\
+    \n\
+    # Configure PostgreSQL to allow password authentication\n\
+    # Make sure pg_hba.conf allows for MD5 auth for all users\n\
+    sudo -u postgres sh -c "echo \"host all all 0.0.0.0/0 md5\" >> $PGDATA/pg_hba.conf"\n\
+    sudo -u postgres sh -c "echo \"listen_addresses = '\''*'\''\" >> $PGDATA/postgresql.conf"\n\
+    \n\
+    # Import schema\n\
+    PGPASSWORD=$POSTGRES_PASSWORD sudo -u postgres psql -d $POSTGRES_DB -f db.sql\n\
+else\n\
+    # Just start PostgreSQL if data directory exists\n\
+    sudo service postgresql start\n\
+    sleep 3 # Give PostgreSQL time to start\n\
+fi\n\
+\n\
+# Update config.py with correct database settings\n\
+cat > /app/config.py << EOF\n\
+db_config = {\n\
+    "dbname": "$POSTGRES_DB",\n\
+    "user": "$POSTGRES_USER",\n\
+    "password": "$POSTGRES_PASSWORD",\n\
+    "host": "postgres",\n\
+    "port": "5432"\n\
+}\n\
+\n\
+# Admin token for secure access\n\
+ADMIN_TOKEN = "b31c9b1c48c2490189b0f49c7f542a2e"\n\
+EOF\n\
+\n\
+# Make sure PostgreSQL is configured for password authentication\n\
+sudo service postgresql restart\n\
+sleep 3 # Give PostgreSQL time to restart\n\
+\n\
+# Start the Flask application\n\
+python backend.py\n\
+' > /app/start.sh
+
+# Make the script executable
+RUN chmod +x /app/start.sh
+
+# Expose the Flask port
+EXPOSE 8080
+
+# Start PostgreSQL and the backend
+CMD ["/app/start.sh"]
