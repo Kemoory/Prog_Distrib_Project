@@ -3,21 +3,55 @@
 ## Images Docker
 
 Les images Docker sur Docker hub :
-- https://hub.docker.com/r/kemoury/mkfrontend
-- https://hub.docker.com/r/kemoury/mkbackend
+- https://hub.docker.com/r/kemoury/tournoi-frontend
+- https://hub.docker.com/r/kemoury/tournoi-backend
 
-## Application
+Construire les images : 
 
 ```
-Ingress NGINX
-  ├── /frontend → frontend-service (Flask)
-  └── /backend  → backend-service (Flask)
+# Backend
+docker build -t your-dockerhub-username/tournoi-backend:latest -f backEnd/Dockerfile.backend .
+docker push your-dockerhub-username/tournoi-backend:latest
 
-Services internes :
-  ├── frontend (interface utilisateur)
-  ├── backend (API + logique des données)
-  └── postgres (base de données)
+# Frontend
+docker build -t your-dockerhub-username/tournoi-frontend:latest -f frontEnd/Dockerfile.frontend .
+docker push your-dockerhub-username/tournoi-frontend:latest
 ```
-Le frontend fait des requêtes http au backend qui va ensuite récupérer les données dans la base pour ensuite les envoyer au frontend qui va les afficher.
+
+## Déploiement
+```
+minikube addons enable ingress
+
+chmod +x deploy.sh
+./deploy.sh
+
+minikube ip
+
+echo "<ip minikube> tournoi.local" | sudo tee -a /etc/hosts
+```
+
+## Vérification du déploiement
+
+```
+# Vérifier les pods
+kubectl get pods -n tournoi-app
+
+# Vérifier les services
+kubectl get services -n tournoi-app
+
+# Vérifier l'Ingress
+kubectl get ingress -n tournoi-app
+
+# Logs du backend
+kubectl logs -f deployment/backend-deployment -n tournoi-app
+
+# Logs du frontend
+kubectl logs -f deployment/frontend-deployment -n tournoi-app
+```
+
+
+## Test
+
+http://tournoi.local
 
 Pour voir à quoi ressemble le site veuillez télécharger la vidéo : presentation_site.mp4
