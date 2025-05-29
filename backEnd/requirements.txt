@@ -2,4 +2,3 @@ flask
 psycopg2-binary
 trueskill
 numpy
-os

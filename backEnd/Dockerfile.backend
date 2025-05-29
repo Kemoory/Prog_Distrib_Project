@@ -64,7 +64,7 @@ db_config = {\n\
     "dbname": "$POSTGRES_DB",\n\
     "user": "$POSTGRES_USER",\n\
     "password": "$POSTGRES_PASSWORD",\n\
-    "host": "postgres",\n\
+    "host": "localhost",\n\
     "port": "5432"\n\
 }\n\
 \n\

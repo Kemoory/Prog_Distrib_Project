@@ -6,8 +6,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Pour les sessions
-BACKEND_URL = os.environ.get('BACKEND_URL', 'http://backend-service:80')
-
+BACKEND_URL = os.environ.get('BACKEND_URL', 'http://127.0.0.1:8080') #Get the backend URL from environment variable, default to localhost for local development
 
 @app.route('/')
 def index():
