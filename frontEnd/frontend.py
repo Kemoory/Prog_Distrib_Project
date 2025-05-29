@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Pour les sessions
-BACKEND_URL = os.environ.get('BACKEND_URL', 'http://backend-service.myproject.svc.cluster.local')
+BACKEND_URL = os.environ.get('BACKEND_URL', 'http://backend-service:80')
 
 
 @app.route('/')

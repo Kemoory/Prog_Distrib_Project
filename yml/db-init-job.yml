@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init-v2  # CHANGÉ: nouveau nom car immutable
+spec:
+  activeDeadlineSeconds: 600
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: db-init
+        image: postgres:15
+        env:
+        - name: PGPASSWORD
+          value: mypass
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Starting database initialization..."
+          
+          # Attendre PostgreSQL avec timeout
+          timeout=120
+          while [ $timeout -gt 0 ]; do
+            if pg_isready -h postgres-service -p 5432 -U myuser; then
+              echo "PostgreSQL is ready!"
+              break
+            fi
+            echo "Waiting for PostgreSQL... ($timeout seconds left)"
+            sleep 2
+            timeout=$((timeout-2))
+          done
+          
+          if [ $timeout -le 0 ]; then
+            echo "Timeout waiting for PostgreSQL"
+            exit 1
+          fi
+          
+          # Créer les tables
+          echo "Creating tables..."
+          psql -h postgres-service -U myuser -d mydb -v ON_ERROR_STOP=1 -c "
+          CREATE TABLE IF NOT EXISTS Joueurs (
+            id SERIAL PRIMARY KEY,
+            nom VARCHAR(255) UNIQUE NOT NULL,
+            mu FLOAT DEFAULT 25.0,
+            sigma FLOAT DEFAULT 8.333,
+            score_trueskill FLOAT GENERATED ALWAYS AS (mu - 3 * sigma) STORED,
+            tier VARCHAR(1)
+          );
+          
+          CREATE TABLE IF NOT EXISTS Tournois (
+            id SERIAL PRIMARY KEY,
+            date DATE NOT NULL UNIQUE
+          );
+          
+          CREATE TABLE IF NOT EXISTS Participations (
+            id SERIAL PRIMARY KEY,
+            joueur_id INTEGER REFERENCES Joueurs(id),
+            tournoi_id INTEGER REFERENCES Tournois(id),
+            score INTEGER NOT NULL,
+            UNIQUE(joueur_id, tournoi_id)
+          );
+          "
+          
+          echo "Database initialized successfully!"
