@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques de {{ nom }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../static/css/styles.css">
+    <link rel="stylesheet" href="../../static/css/dark-mode.css">
+    <link rel="stylesheet" href="../../static/css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <section class="hero is-primary is-small animated-gradient">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-2 has-text-centered glow-text">
+                    <i class="fas fa-user"></i> {{ nom }}
+                </h1>
+                <h2 class="subtitle has-text-centered">
+                    {% if stats.tier == 'S' %}
+                        <span class="tag is-warning">Tier S</span>
+                    {% elif stats.tier == 'A' %}
+                        <span class="tag is-success">Tier A</span>
+                    {% elif stats.tier == 'B' %}
+                        <span class="tag is-info">Tier B</span>
+                    {% elif stats.tier == 'C' %}
+                        <span class="tag is-primary">Tier C</span>
+                    {% else %}
+                        <span class="tag is-light">Tier {{ stats.tier }}</span>
+                    {% endif %}
+                    
+                    {% if stats.victoires >= 3 %}
+                    <span class="tag is-danger ml-2">
+                        <i class="fas fa-fire"></i> {{ stats.victoires }} victoires
+                    </span>
+                    {% endif %}
+                    
+                    {% if stats.percentile_trueskill >= 90 %}
+                    <span class="tag is-warning ml-2">
+                        <i class="fas fa-star"></i> Top {{ 100 - stats.percentile_trueskill|round|int }}%
+                    </span>
+                    {% endif %}
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <!-- Colonne de gauche: Stats générales -->
+                <div class="column is-4">
+                    <div class="card glass-card fade-in">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-chart-line"></i> Statistiques Générales
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="content">
+                                <div class="level is-mobile">
+                                    <div class="level-item has-text-centered">
+                                        <div>
+                                            <p class="heading">TrueSkill</p>
+                                            <p class="title">{{ stats.score_trueskill|round(1) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="level-item has-text-centered">
+                                        <div>
+                                            <p class="heading">Percentile</p>
+                                            <p class="title">{{ percentile_trueskill }}%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <table class="table is-fullwidth">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="fas fa-trophy"></i> Tournois</td>
+                                            <td class="has-text-right">{{ stats.nombre_tournois }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-medal"></i> Victoires</td>
+                                            <td class="has-text-right">{{ stats.victoires }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-percentage"></i> Ratio V/T</td>
+                                            <td class="has-text-right">{{ (stats.victoires / stats.nombre_tournois * 100)|round(1) if stats.nombre_tournois > 0 else 0 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-calculator"></i> Score moyen</td>
+                                            <td class="has-text-right">{{ stats.score_moyen|round(1) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fas fa-arrow-up"></i> Meilleur score</td>
+                                            <td class="has-text-right">{{ stats.meilleur_score }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Indicateurs de performance -->
+                    <div class="card glass-card mt-4 fade-in">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-tachometer-alt"></i> Indicateurs de Performance
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="content">
+                                <div class="field">
+                                    <label class="label">Constance (écart-type)</label>
+                                    <progress class="progress is-primary" 
+                                              value="{{ 100 - (stats.ecart_type_scores / stats.score_moyen * 100)|round if stats.score_moyen > 0 and stats.ecart_type_scores else 0 }}" 
+                                              max="100">
+                                        {{ 100 - (stats.ecart_type_scores / stats.score_moyen * 100)|round if stats.score_moyen > 0 and stats.ecart_type_scores else 0 }}%
+                                    </progress>
+                                    <p class="help">
+                                        {% if stats.ecart_type_scores and stats.score_moyen %}
+                                            Écart-type de {{ stats.ecart_type_scores|round(1) }} ({{ (stats.ecart_type_scores / stats.score_moyen * 100)|round }}% de la moyenne)
+                                        {% else %}
+                                            Données insuffisantes
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                
+                                <div class="field">
+                                    <label class="label">Progression récente</label>
+                                    <progress class="progress {{ 'is-success' if stats.progression_recente > 0 else 'is-danger' if stats.progression_recente < 0 else 'is-light' }}" 
+                                              value="{{ (50 + stats.progression_recente * 5)|round if stats.progression_recente else 50 }}" 
+                                              max="100">
+                                        {{ (50 + stats.progression_recente * 5)|round if stats.progression_recente else 50 }}%
+                                    </progress>
+                                    <p class="help">
+                                        {% if stats.progression_recente > 0 %}
+                                            En amélioration (+{{ stats.progression_recente|round(1) }} points)
+                                        {% elif stats.progression_recente < 0 %}
+                                            En déclin ({{ stats.progression_recente|round(1) }} points)
+                                        {% else %}
+                                            Stable
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                
+                                <div class="field">
+                                    <label class="label">Position moyenne</label>
+                                    <progress class="progress is-info" 
+                                              value="{{ (10 - stats.position_moyenne) * 10 if stats.position_moyenne else 0 }}" 
+                                              max="100">
+                                        {{ (10 - stats.position_moyenne) * 10 if stats.position_moyenne else 0 }}%
+                                    </progress>
+                                    <p class="help">
+                                        Position moyenne: {{ stats.position_moyenne|round(1) if stats.position_moyenne else 'N/A' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Colonne de droite: Graphiques -->
+                <div class="column is-8">
+                    <!-- Évolution des scores -->
+                    <div class="card glass-card fade-in">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-chart-line"></i> Évolution des Scores
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="content">
+                                <canvas id="scoreChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historique des tournois -->
+            <div class="columns mt-5">
+                <div class="column is-12">
+                    <div class="card glass-card fade-in">
+                        <div class="card-header">
+                            <p class="card-header-title">
+                                <i class="fas fa-history"></i> Historique des tournois
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="content">
+                                <table class="table is-fullwidth is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Score</th>
+                                            <th>Position</th>
+                                            <th>Performance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for tournoi in historique %}
+                                        <tr class="fade-in" style="animation-delay: {{ loop.index * 0.1 }}s">
+                                            <td>{{ tournoi.date }}</td>
+                                            <td>{{ tournoi.score }}</td>
+                                            <td>
+                                                {% if tournoi.position == 1 %}
+                                                    <span class="tag is-warning"><i class="fas fa-crown"></i> 1er</span>
+                                                {% elif tournoi.position == 2 %}
+                                                    <span class="tag is-light"><i class="fas fa-medal"></i> 2ème</span>
+                                                {% elif tournoi.position == 3 %}
+                                                    <span class="tag is-danger"><i class="fas fa-medal"></i> 3ème</span>
+                                                {% else %}
+                                                    <span class="tag is-info">{{ tournoi.position }}ème</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="performance-bar">
+                                                    {% if stats.meilleur_score > 0 %}
+                                                        <div class="performance-fill" style="width: {{ (tournoi.score / stats.meilleur_score * 100)|round }}%"></div>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../../static/js/script.js"></script>
+    <script src="../../static/js/dark-mode.js"></script>
+    <script src="../../static/js/animations.js"></script>
+    
+    <script>
+    // Script pour le graphique d'évolution des scores
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('scoreChart').getContext('2d');
+        
+        // Récupérer les données pour le graphique
+        var tournois = [
+            {% for tournoi in historique %}
+                {
+                    date: "{{ tournoi.date }}",
+                    score: {{ tournoi.score }},
+                    position: {{ tournoi.position }}
+                }{{ "," if not loop.last }}
+            {% endfor %}
+        ];
+        
+        // Inverser l'ordre pour avoir l'évolution chronologique
+        tournois.reverse();
+        
+        var dates = tournois.map(function(t) { return t.date; });
+        var scores = tournois.map(function(t) { return t.score; });
+        var positions = tournois.map(function(t) { return t.position; });
+        
+        var scoreChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Score',
+                    data: scores,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                var tournoi = tournois[context.dataIndex];
+                                return 'Position: ' + tournoi.position;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+    </script>
+</body>
+</html>

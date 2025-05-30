@@ -1,0 +1,248 @@
+/* Variables pour le mode sombre amélioré avec meilleur contraste */
+:root {
+    --background-color: #0f172a;
+    --secondary-background: #1e293b;
+    --text-color: #f1f5f9;
+    --primary-color: #3b82f6;
+    --secondary-color: #2563eb;
+    --accent-color: #f59e0b;
+    --danger-color: #ef4444;
+    --success-color: #10b981;
+    --box-background-color: #1e293b;
+    --card-background: rgba(30, 41, 59, 0.8);
+    --input-background: #e2e8f0;
+    --input-text-color: #1a202c;
+    --header-text-color: #f8fafc;
+    --label-color: #f1f5f9; /* Éclaircissement pour meilleure lisibilité */
+    --border-color: rgba(59, 130, 246, 0.3);
+    --hover-color: #334155;
+}
+
+/* Appliquer les couleurs du mode sombre */
+body, html {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: var(--secondary-background) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0 !important;
+}
+
+.navbar-item, .navbar-link {
+    color: var(--text-color) !important;
+    transition: all 0.3s ease;
+}
+
+.navbar-item:hover, .navbar-link:hover, .navbar-item.is-active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.navbar-dropdown {
+    background-color: var(--secondary-background);
+    border-top: 2px solid var(--primary-color);
+}
+
+.navbar-divider {
+    background-color: var(--border-color);
+}
+
+/* Button styling */
+.button {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.button.is-primary {
+    background-color: var(--primary-color);
+    border-color: transparent;
+}
+
+.button.is-primary:hover {
+    background-color: var(--secondary-color);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    transform: translateY(-2px);
+}
+
+.button.is-light {
+    background-color: var(--secondary-background);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.button.is-light:hover {
+    background-color: var(--hover-color);
+}
+
+.button.is-outlined {
+    background-color: transparent;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.button.is-outlined:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Input styling */
+.input, .textarea, .select select {
+    background-color: var(--input-background);
+    color: var(--input-text-color);
+    border-color: var(--border-color);
+    border-radius: 6px;
+}
+
+.input:focus, .textarea:focus, .select select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.125em rgba(59, 130, 246, 0.25);
+}
+
+/* Card and box styling */
+.box, .card {
+    background-color: var(--box-background-color);
+    color: var(--text-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Label styling pour meilleure lisibilité */
+.label {
+    color: var(--label-color) !important; /* Force l'application de la couleur claire */
+    font-weight: 600;
+}
+
+/* Card content styling */
+.card-content {
+    color: var(--text-color);
+}
+
+/* Table styling */
+.table {
+    background-color: transparent;
+    color: var(--text-color);
+}
+
+.table thead th {
+    color: var(--header-text-color) !important;
+    background-color: var(--secondary-background) !important;
+    border-color: var(--border-color);
+    font-weight: 600;
+}
+
+.table td {
+    border-color: var(--border-color);
+    vertical-align: middle;
+}
+
+.table.is-hoverable tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Titre et texte */
+.title, .subtitle, .card-header-title {
+    color: var(--header-text-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hero section */
+.hero.is-primary {
+    background-color: var(--primary-color);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--secondary-background);
+    color: var(--text-color);
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+/* Tags styling */
+.tag {
+    border-radius: 20px;
+}
+
+.tier-tag {
+    width: 100%;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* Player name styling */
+.player-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+/* Transitions générales */
+a, button, input, .card, .box {
+    transition: all 0.3s ease;
+}
+
+/* Amélioration des bordures */
+.card, .box {
+    border: 1px solid var(--border-color);
+}
+
+/* Brand item */
+.brand-item {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Correction des stats-box */
+.stat-box {
+    background-color: var(--secondary-background);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+/* Tabs */
+.tabs li.is-active a {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.tabs a {
+    color: var(--text-color) !important;
+}
+
+.tabs a:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Amélioration spécifique pour les cartes en verre */
+.glass-card .card-content {
+    color: var(--text-color);
+}
+
+/* Style spécifique pour les labels dans les cartes en verre */
+.glass-card .label {
+    color: #e2e8f0 !important; /* Couleur encore plus claire pour un meilleur contraste */
+}
+
+/* Style pour améliorer la lisibilité dans les boîtes de joueurs */
+.joueur {
+    color: var(--text-color);
+}
+
+.tag.is-bronze {
+    background-color: #753d04; /* Couleur bronze */
+    color: white;
+  }
+  

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques par Tournoi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/dark-mode.css">
+    <link rel="stylesheet" href="../static/css/animations.css">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <section class="hero is-primary is-small animated-gradient">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-2 has-text-centered glow-text">
+                    <i class="fas fa-trophy"></i> Statistiques par Tournoi
+                </h1>
+                <h2 class="subtitle has-text-centered">
+                    Historique et résultats de tous les tournois
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-10 is-offset-1">
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-history"></i> Historique des Tournois
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="field has-addons">
+                                            <div class="control">
+                                                <input class="input" type="date" id="tournoisDateSearch">
+                                            </div>
+                                            <div class="control">
+                                                <button class="button is-primary" id="btnSearchDate">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <button class="button is-info" id="btnResetSearch">
+                                            <span class="icon">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </span>
+                                            <span>Réinitialiser</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="content">
+                                <table class="table is-fullwidth is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-calendar-alt"></i> Date</th>
+                                            <th><i class="fas fa-users"></i> Participants</th>
+                                            <th><i class="fas fa-crown"></i> Vainqueur</th>
+                                            <th><i class="fas fa-star"></i> Score max</th>
+                                            <th><i class="fas fa-info-circle"></i> Détails</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for tournoi in tournois %}
+                                        <tr class="fade-in tournoi-row" style="animation-delay: {{ loop.index * 0.1 }}s" data-date="{{ tournoi.date }}">
+                                            <td>{{ tournoi.date }}</td>
+                                            <td>{{ tournoi.participants }}</td>
+                                            <td>
+                                                <a href="/stats/joueur/{{ tournoi.vainqueur }}" class="has-text-primary">
+                                                    {{ tournoi.vainqueur }}
+                                                </a>
+                                            </td>
+                                            <td>{{ tournoi.score_max }}</td>
+                                            <td>
+                                                <a href="/stats/tournoi/{{ tournoi.id }}" class="button is-small is-primary is-outlined">
+                                                    <span class="icon">
+                                                        <i class="fas fa-chart-bar"></i>
+                                                    </span>
+                                                    <span>Voir détails</span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                                <a class="pagination-previous" disabled>Précédent</a>
+                                <a class="pagination-next">Suivant</a>
+                                <ul class="pagination-list">
+                                    <li><a class="pagination-link is-current" aria-label="Page 1" aria-current="page">1</a></li>
+                                    <li><a class="pagination-link" aria-label="Page 2">2</a></li>
+                                    <li><a class="pagination-link" aria-label="Page 3">3</a></li>
+                                    <li><span class="pagination-ellipsis">&hellip;</span></li>
+                                    <li><a class="pagination-link" aria-label="Page 10">10</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../static/js/script.js"></script>
+    <script>
+        // Animation pour les éléments au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElems = document.querySelectorAll('.fade-in');
+            fadeElems.forEach(elem => {
+                elem.classList.add('visible');
+            });
+            
+            // Recherche par date
+            const dateSearch = document.getElementById('tournoisDateSearch');
+            const btnSearchDate = document.getElementById('btnSearchDate');
+            const btnResetSearch = document.getElementById('btnResetSearch');
+            
+            function filterTournois() {
+                const searchDate = dateSearch.value;
+                if (!searchDate) return;
+                
+                const rows = document.querySelectorAll('.tournoi-row');
+                
+                rows.forEach(row => {
+                    const rowDate = row.getAttribute('data-date');
+                    if (rowDate.includes(searchDate)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            function resetFilter() {
+                dateSearch.value = '';
+                const rows = document.querySelectorAll('.tournoi-row');
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+            }
+            
+            btnSearchDate.addEventListener('click', filterTournois);
+            btnResetSearch.addEventListener('click', resetFilter);
+        });
+    </script>
+</body>
+</html>

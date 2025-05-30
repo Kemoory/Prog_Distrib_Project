@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Tournoi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/dark-mode.css">
+    <link rel="stylesheet" href="../static/css/animations.css">
+    <link rel="stylesheet" href="../static/css/form-readability.css">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <section class="hero is-primary is-small animated-gradient">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-2 has-text-centered glow-text">
+                    <i class="fas fa-plus-circle"></i> Ajouter un Tournoi
+                </h1>
+                <h2 class="subtitle has-text-centered">
+                    Enregistrez les résultats d'une nouvelle compétition
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-10 is-offset-1">
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-gamepad"></i> Détails du Tournoi
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <form id="tournoiForm" action="/add_tournament" method="post">
+                                <div class="field">
+                                    <label class="label" for="date">Date du tournoi:</label>
+                                    <div class="control has-icons-left">
+                                        <input type="date" id="date" name="date" class="input" required>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <h3 class="title is-4 mt-5 mb-3">
+                                    <i class="fas fa-users"></i> Participants
+                                </h3>
+
+                                <div id="joueursContainer">
+                                    <div class="box joueur glass-card">
+                                        <div class="field">
+                                            <label class="label" for="nom1">Nom du joueur 1:</label>
+                                            <div class="control has-icons-left">
+                                                <input type="text" id="nom1" name="nom1" class="input player-name-input" list="existingPlayers" required>
+                                                <span class="icon is-small is-left">
+                                                    <i class="fas fa-user"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label" for="score1">Score du joueur 1:</label>
+                                            <div class="control has-icons-left">
+                                                <input type="number" id="score1" name="score1" class="input" required>
+                                                <span class="icon is-small is-left">
+                                                    <i class="fas fa-star"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="button is-danger is-small remove-joueur" onclick="supprimerJoueur(this)">
+                                            <span class="icon">
+                                                <i class="fas fa-trash"></i>
+                                            </span>
+                                            <span>Supprimer</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="field is-grouped mt-4">
+                                    <div class="control">
+                                        <button type="button" class="button is-primary" onclick="ajouterJoueur()">
+                                            <span class="icon">
+                                                <i class="fas fa-plus"></i>
+                                            </span>
+                                            <span>Ajouter un joueur</span>
+                                        </button>
+                                    </div>
+                                    <div class="control">
+                                        <button type="submit" class="button is-success">
+                                            <span class="icon">
+                                                <i class="fas fa-save"></i>
+                                            </span>
+                                            <span>Enregistrer le tournoi</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../static/js/script.js"></script>
+</body>
+</html>

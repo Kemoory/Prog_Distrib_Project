@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classement Mario Kart</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/dark-mode.css">
+    <link rel="stylesheet" href="../static/css/animations.css">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <section class="hero is-primary is-small animated-gradient">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-2 has-text-centered glow-text">
+                    <i class="fas fa-trophy"></i> Classement Général
+                </h1>
+                <h2 class="subtitle has-text-centered">
+                    Les meilleurs pilotes de Mario Kart
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-10 is-offset-1">
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <p class="card-header-title is-centered">
+                                <i class="fas fa-chart-line"></i> Classement TrueSkill
+                            </p>
+                        </div>
+                        <div class="card-content">
+                            <div class="tabs is-centered is-boxed">
+                                <ul>
+                                    <li class="{{ 'is-active' if not tier_actif else '' }}">
+                                        <a href="/classement">
+                                            <i class="fas fa-list"></i> Tous les joueurs
+                                        </a>
+                                    </li>
+                                    <li class="{{ 'is-active' if tier_actif == 'S' else '' }}">
+                                        <a href="/classement?tier=S">
+                                            <i class="fas fa-star"></i> Tier S
+                                        </a>
+                                    </li>
+                                    <li class="{{ 'is-active' if tier_actif == 'A' else '' }}">
+                                        <a href="/classement?tier=A">
+                                            <i class="fas fa-award"></i> Tier A
+                                        </a>
+                                    </li>
+                                    <li class="{{ 'is-active' if tier_actif == 'B' else '' }}">
+                                        <a href="/classement?tier=B">
+                                            <i class="fas fa-medal"></i> Tier B
+                                        </a>
+                                    </li>
+                                    <li class="{{ 'is-active' if tier_actif == 'C' else '' }}">
+                                        <a href="/classement?tier=C">
+                                            <i class="fas fa-medal"></i> Tier C
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="content">
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            <div class="field has-addons">
+                                                <div class="control">
+                                                    <input class="input" type="text" id="joueurSearch" placeholder="Rechercher un joueur">
+                                                </div>
+                                                <div class="control">
+                                                    <button class="button is-primary" id="btnSearchJoueur">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table class="table is-fullwidth is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-hashtag"></i> Rang</th>
+                                            <th><i class="fas fa-user"></i> Nom</th>
+                                            <th><i class="fas fa-chart-line"></i> Score TrueSkill</th>
+                                            <th><i class="fas fa-layer-group"></i> Tier</th>
+                                            <th><i class="fas fa-chart-bar"></i> Statistiques</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableJoueurs">
+                                        {% for joueur in joueurs %}
+                                            <tr class="fade-in joueur-row" style="animation-delay: {{ loop.index * 0.1 }}s" data-nom="{{ joueur[0] }}">
+                                                <td>
+                                                    {% if loop.index == 1 %}
+                                                        <span class="tag is-warning"><i class="fas fa-crown"></i> 1</span>
+                                                    {% elif loop.index == 2 %}
+                                                        <span class="tag is-light"><i class="fas fa-medal"></i> 2</span>
+                                                    {% elif loop.index == 3 %}
+                                                        <span class="tag is-danger"><i class="fas fa-medal"></i> 3</span>
+                                                    {% else %}
+                                                        <span class="tag is-info">{{ loop.index }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="player-name">
+                                                        {{ joueur[0] }}
+                                                        {% if loop.index <= 3 %}
+                                                            <span class="icon has-text-warning">
+                                                                <i class="fas fa-star"></i>
+                                                            </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="score-bar">
+                                                        {% if joueurs[0][1] > 0 and joueur[1] > 0 %}
+                                                            <div class="score-fill" style="width: {{ (joueur[1] / joueurs[0][1] * 100) }}%">
+                                                                <span>{{ joueur[1] }}</span>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="score-fill" style="width: 0%">
+                                                                <span>{{ joueur[1] }}</span>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {% if joueur[2] == 'S' %}
+                                                        <span class="tag is-warning tier-tag">S</span>
+                                                    {% elif joueur[2] == 'A' %}
+                                                        <span class="tag is-success tier-tag">A</span>
+                                                    {% elif joueur[2] == 'B' %}
+                                                        <span class="tag is-info tier-tag">B</span>
+                                                    {% elif joueur[2] == 'C' %}
+                                                        <span class="tag is-primary tier-tag">C</span>
+                                                    {% else %}
+                                                        <span class="tag is-light tier-tag">{{ joueur[2] }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="/stats/joueur/{{ joueur[0] }}" class="button is-small is-primary is-outlined">
+                                                        <span class="icon">
+                                                            <i class="fas fa-chart-pie"></i>
+                                                        </span>
+                                                        <span>Détails</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../static/js/script.js"></script>
+    <script>
+        // Animation pour les éléments au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElems = document.querySelectorAll('.fade-in');
+            fadeElems.forEach(elem => {
+                elem.classList.add('visible');
+            });
+            
+            // Recherche de joueur
+            const joueurSearch = document.getElementById('joueurSearch');
+            const btnSearchJoueur = document.getElementById('btnSearchJoueur');
+            
+            function filterJoueurs() {
+                const searchText = joueurSearch.value.toLowerCase();
+                const rows = document.querySelectorAll('.joueur-row');
+                
+                rows.forEach(row => {
+                    const nom = row.getAttribute('data-nom').toLowerCase();
+                    if (nom.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            joueurSearch.addEventListener('keyup', filterJoueurs);
+            btnSearchJoueur.addEventListener('click', filterJoueurs);
+        });
+    </script>
+</body>
+</html>
