@@ -6,14 +6,6 @@ echo "🚀 Déploiement de l'application Tournoi sur Kubernetes"
 echo "📁 Création du namespace..."
 kubectl apply -f kubernetes/namespace.yaml
 
-# Déployer la sécurité RBAC
-echo "🔒 Configuration de la sécurité RBAC..."
-kubectl apply -f kubernetes/rbac-security.yaml
-
-# Déployer les secrets
-echo "🔑 Déploiement des secrets..."
-kubectl apply -f kubernetes/advanced-security.yaml
-
 # Déployer les ConfigMaps
 echo "⚙️ Déploiement des ConfigMaps..."
 kubectl apply -f kubernetes/configmap.yaml
