@@ -10,10 +10,6 @@ kubectl apply -f kubernetes/namespace.yaml
 echo "🔒 Configuration de la sécurité RBAC..."
 kubectl apply -f kubernetes/rbac-security.yaml
 
-# Déployer les secrets
-echo "🔑 Déploiement des secrets..."
-kubectl apply -f kubernetes/advanced-security.yaml
-
 # Déployer les ConfigMaps
 echo "⚙️ Déploiement des ConfigMaps..."
 kubectl apply -f kubernetes/configmap.yaml
