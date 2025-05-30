@@ -1,0 +1,80 @@
+# Service Account pour l'application
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tournoi-service-account
+  namespace: tournoi-app
+---
+# Role définissant les permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: tournoi-app
+  name: tournoi-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"]
+---
+# RoleBinding liant le ServiceAccount au Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tournoi-role-binding
+  namespace: tournoi-app
+subjects:
+- kind: ServiceAccount
+  name: tournoi-service-account
+  namespace: tournoi-app
+roleRef:
+  kind: Role
+  name: tournoi-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# NetworkPolicy pour sécuriser les communications
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tournoi-network-policy
+  namespace: tournoi-app
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: tournoi-app
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+  - ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 5000
+    - protocol: TCP
+      port: 5432
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: tournoi-app
+  - ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 5000
+    - protocol: TCP
+      port: 5432
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
