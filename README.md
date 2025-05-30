@@ -20,6 +20,7 @@ docker push your-dockerhub-username/tournoi-frontend:latest
 
 ## Déploiement
 ```
+minikube start
 minikube addons enable ingress
 
 chmod +x deploy.sh
