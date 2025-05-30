@@ -1,0 +1,9 @@
+test_deployment:
+  stage: test
+  script:
+    - kubectl apply -f kubernetes/
+    - sleep 30  # Attendre le déploiement
+    - ./test_battery.sh
+  only:
+    - main
+    - develop
