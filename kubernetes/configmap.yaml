@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tournoi-config
+  namespace: tournoi-app
+data:
+  backend-url: "http://backend-service:8080"
+  app-name: "Tournoi Management System"
+  debug: "false"
