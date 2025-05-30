@@ -49,10 +49,19 @@ kubectl logs -f deployment/backend-deployment -n tournoi-app
 # Logs du frontend
 kubectl logs -f deployment/frontend-deployment -n tournoi-app
 ```
-
+http://tournoi.local
 
 ## Test
 
-http://tournoi.local
+```
+# Rendre le script exécutable
+chmod +x test_battery.sh
+
+# Exécuter tous les tests
+./test_battery.sh
+
+# Ou rediriger la sortie vers un fichier de log
+./test_battery.sh | tee test_results.log
+```
 
 Pour voir à quoi ressemble le site veuillez télécharger la vidéo : presentation_site.mp4
